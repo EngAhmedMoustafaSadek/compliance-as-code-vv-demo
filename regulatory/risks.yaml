@@ -1,0 +1,41 @@
+# Risk analysis extract (ISO 14971 style): hazards, risk controls and the
+# requirements that implement each control. A risk control counts as verified only
+# when every requirement it relies on is verified by passing tests.
+# Demo only: synthetic module, not a medical device.
+
+hazards:
+  - id: HAZ-01
+    hazardous_situation: A pulse rate derived from a corrupted signal is displayed.
+    harm: Clinician acts on a wrong value, delaying or misdirecting treatment.
+    risk_controls: [RC-01, RC-02]
+
+  - id: HAZ-02
+    hazardous_situation: An abnormal pulse rate is not brought to the clinician's attention.
+    harm: Missed deterioration.
+    risk_controls: [RC-03, RC-04]
+
+  - id: HAZ-03
+    hazardous_situation: A rate is computed from too little data and is unstable.
+    harm: Clinician acts on a wrong value.
+    risk_controls: [RC-05]
+
+risk_controls:
+  - id: RC-01
+    description: Detect flatline, clipping and dropout before deriving any value.
+    requirements: [REQ-004, REQ-005, REQ-006]
+
+  - id: RC-02
+    description: Never output a rate from an inadequate signal. Raise a quality alarm instead.
+    requirements: [REQ-007]
+
+  - id: RC-03
+    description: Alarm when the rate is outside configurable limits.
+    requirements: [REQ-008]
+
+  - id: RC-04
+    description: Rate accuracy verified across the physiological range.
+    requirements: [REQ-001, REQ-002]
+
+  - id: RC-05
+    description: Reject recordings shorter than the minimum length.
+    requirements: [REQ-003]

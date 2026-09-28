@@ -1,0 +1,42 @@
+name: Verification
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Tests may fail here; the traceability gate below turns failures into a
+      # blocking result and still produces the evidence package.
+      - name: Run unit and BDD tests
+        run: pytest --junitxml=reports/junit.xml
+        continue-on-error: true
+
+      - name: Advisory LLM coverage review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python tools/llm_review.py
+        continue-on-error: true
+
+      - name: Traceability gate and verification report
+        run: python tools/trace.py
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-evidence-${{ github.sha }}
+          path: reports/

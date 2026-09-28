@@ -1,0 +1,65 @@
+# Software requirements (IEC 62304 clause 5.2 style).
+# Demo only: synthetic module, not a medical device.
+# Every requirement must be verified by at least one passing test, or the gate fails.
+
+software: pulsesig
+safety_class: C   # IEC 62304 software safety class assumed for this demo
+
+requirements:
+  - id: REQ-001
+    title: Signal smoothing
+    text: >
+      The software shall smooth the input signal with a moving-average filter that
+      preserves signal length and reduces the standard deviation of white noise by
+      at least 50% with a 5-sample window.
+    verification: unit test
+
+  - id: REQ-002
+    title: Pulse rate accuracy
+    text: >
+      For clean pulsatile signals sampled at 100 Hz between 40 and 180 bpm, the
+      estimated pulse rate shall be within 2 bpm of the true rate.
+    verification: system test (BDD) and unit test
+
+  - id: REQ-003
+    title: Minimum data length
+    text: >
+      The software shall reject signals shorter than 4 seconds with an
+      insufficient-data error instead of returning a pulse rate.
+    verification: system test (BDD) and unit test
+
+  - id: REQ-004
+    title: Flatline detection
+    text: >
+      The software shall classify signal quality as inadequate when the signal
+      standard deviation is below 0.001.
+    verification: system test (BDD)
+
+  - id: REQ-005
+    title: Clipping detection
+    text: >
+      The software shall classify signal quality as inadequate when more than 5% of
+      samples sit at the signal's minimum or maximum value.
+    verification: system test (BDD)
+
+  - id: REQ-006
+    title: Dropout detection
+    text: >
+      The software shall classify signal quality as inadequate when any sample is
+      missing.
+    verification: system test (BDD)
+
+  - id: REQ-007
+    title: No rate from inadequate signal
+    text: >
+      When signal quality is inadequate, the software shall not output a pulse rate
+      and shall raise a SIGNAL_QUALITY alarm.
+    verification: system test (BDD)
+
+  - id: REQ-008
+    title: Rate alarms
+    text: >
+      The software shall raise a LOW_RATE alarm when the pulse rate is below the low
+      limit and a HIGH_RATE alarm when it is above the high limit. Defaults are
+      40 bpm and 150 bpm, and both limits shall be configurable.
+    verification: system test (BDD)

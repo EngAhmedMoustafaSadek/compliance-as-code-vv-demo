@@ -1,0 +1,16 @@
+[project]
+name = "pulsesig"
+version = "0.1.0"
+description = "Synthetic pulse-rate module used to demonstrate compliance-as-code verification. Not a medical device."
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
+addopts = "--strict-markers"
+bdd_features_base_dir = "tests/features"
+markers = [
+    "req(id): links a test to a software requirement in regulatory/requirements.yaml",
+    "rc(id): links a test to a risk control in regulatory/risks.yaml",
+]
